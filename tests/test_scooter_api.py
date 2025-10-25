@@ -1,8 +1,7 @@
-import requests
 import pytest
 import allure
-from .helpers import generate_random_string, register_new_courier_and_return_login_password
-from .urls import BASE_URL
+from .helpers import generate_random_string
+from . import api
 
 @allure.feature('Courier API')
 class TestCourierAPI:
@@ -20,7 +19,7 @@ class TestCourierAPI:
             "firstName": first_name
         }
 
-        response = requests.post(f'{BASE_URL}/courier', data=payload)
+        response = api.create_courier(payload)
 
         assert response.status_code == 201
         assert response.json() == {"ok": True}
@@ -38,8 +37,8 @@ class TestCourierAPI:
             "firstName": first_name
         }
 
-        requests.post(f'{BASE_URL}/courier', data=payload)
-        response = requests.post(f'{BASE_URL}/courier', data=payload)
+        api.create_courier(payload)
+        response = api.create_courier(payload)
 
         assert response.status_code == 409
         assert "Этот логин уже используется" in response.text
@@ -55,7 +54,7 @@ class TestCourierAPI:
         }
         del payload[missing_field]
 
-        response = requests.post(f'{BASE_URL}/courier', data=payload)
+        response = api.create_courier(payload)
 
         assert response.status_code == 400
         assert "Недостаточно данных для создания учетной записи" in response.text
@@ -63,13 +62,13 @@ class TestCourierAPI:
     @allure.story('Login Courier')
     @allure.title('Test successful courier login')
     def test_login_courier_success(self):
-        credentials = register_new_courier_and_return_login_password()
+        credentials = api.register_new_courier_and_return_login_password()
         payload = {
             "login": credentials[0],
             "password": credentials[1]
         }
 
-        response = requests.post(f'{BASE_URL}/courier/login', data=payload)
+        response = api.login_courier(payload)
 
         assert response.status_code == 200
         assert "id" in response.json()
@@ -77,13 +76,13 @@ class TestCourierAPI:
     @allure.story('Login Courier')
     @allure.title('Test courier login with incorrect credentials')
     def test_login_courier_incorrect_credentials_error(self):
-        credentials = register_new_courier_and_return_login_password()
+        credentials = api.register_new_courier_and_return_login_password()
         payload = {
             "login": credentials[0],
             "password": "incorrect_password"
         }
 
-        response = requests.post(f'{BASE_URL}/courier/login', data=payload)
+        response = api.login_courier(payload)
 
         assert response.status_code == 404
 
@@ -91,7 +90,7 @@ class TestCourierAPI:
     @allure.title('Test courier login with missing required fields')
     @pytest.mark.parametrize("missing_field", ["login", "password"])
     def test_login_courier_missing_field_error(self, missing_field):
-        credentials = register_new_courier_and_return_login_password()
+        credentials = api.register_new_courier_and_return_login_password()
         payload = {
             "login": credentials[0],
             "password": credentials[1]
@@ -101,7 +100,7 @@ class TestCourierAPI:
         else:
             del payload[missing_field]
 
-        response = requests.post(f'{BASE_URL}/courier/login', data=payload)
+        response = api.login_courier(payload)
     
         assert response.status_code == 400
         assert "Недостаточно данных для входа" in response.text
@@ -114,7 +113,7 @@ class TestCourierAPI:
             "password": "password"
         }
 
-        response = requests.post(f'{BASE_URL}/courier/login', data=payload)
+        response = api.login_courier(payload)
 
         assert response.status_code == 404
 
@@ -142,7 +141,7 @@ class TestOrderAPI:
             "color": color
         }
 
-        response = requests.post(f'{BASE_URL}/orders', json=payload)
+        response = api.create_order(payload)
 
         assert response.status_code == 201
         assert "track" in response.json()
@@ -150,6 +149,6 @@ class TestOrderAPI:
     @allure.story('Get Orders')
     @allure.title('Test getting the list of orders')
     def test_get_orders_list(self):
-        response = requests.get(f'{BASE_URL}/orders')
+        response = api.get_orders()
         assert response.status_code == 200
         assert isinstance(response.json()["orders"], list)
