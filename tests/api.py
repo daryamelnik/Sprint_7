@@ -19,7 +19,10 @@ def create_order(payload):
 def get_orders():
     return requests.get(f'{BASE_URL}/orders')
 
-@allure.step('Register a new courier and return login and password')
+@allure.step('Delete a courier')
+def delete_courier(courier_id):
+    return requests.delete(f'{BASE_URL}/courier/{courier_id}')
+
 def register_new_courier_and_return_login_password():
     login = generate_random_string(10)
     password = generate_random_string(10)
