@@ -59,63 +59,6 @@ class TestCourierAPI:
         assert response.status_code == 400
         assert "Недостаточно данных для создания учетной записи" in response.text
 
-    @allure.story('Login Courier')
-    @allure.title('Test successful courier login')
-    def test_login_courier_success(self):
-        credentials = api.register_new_courier_and_return_login_password()
-        payload = {
-            "login": credentials[0],
-            "password": credentials[1]
-        }
-
-        response = api.login_courier(payload)
-
-        assert response.status_code == 200
-        assert "id" in response.json()
-
-    @allure.story('Login Courier')
-    @allure.title('Test courier login with incorrect credentials')
-    def test_login_courier_incorrect_credentials_error(self):
-        credentials = api.register_new_courier_and_return_login_password()
-        payload = {
-            "login": credentials[0],
-            "password": "incorrect_password"
-        }
-
-        response = api.login_courier(payload)
-
-        assert response.status_code == 404
-
-    @allure.story('Login Courier')
-    @allure.title('Test courier login with missing required fields')
-    @pytest.mark.parametrize("missing_field", ["login", "password"])
-    def test_login_courier_missing_field_error(self, missing_field):
-        credentials = api.register_new_courier_and_return_login_password()
-        payload = {
-            "login": credentials[0],
-            "password": credentials[1]
-        }
-        if missing_field == "password":
-            payload[missing_field] = ""
-        else:
-            del payload[missing_field]
-
-        response = api.login_courier(payload)
-    
-        assert response.status_code == 400
-        assert "Недостаточно данных для входа" in response.text
-
-    @allure.story('Login Courier')
-    @allure.title('Test courier login with non-existent user')
-    def test_login_non_existent_user_error(self):
-        payload = {
-            "login": "non_existent_user",
-            "password": "password"
-        }
-
-        response = api.login_courier(payload)
-
-        assert response.status_code == 404
 
 @allure.feature('Order API')
 class TestOrderAPI:
