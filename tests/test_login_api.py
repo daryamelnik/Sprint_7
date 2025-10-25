@@ -56,22 +56,30 @@ class TestLoginAPI:
         response = api.login_courier(payload)
 
         assert response.status_code == 404
+        assert "Учетная запись не найдена" in response.text
 
     @allure.story('Login Courier')
-    @allure.title('Test courier login with missing required fields')
-    @pytest.mark.parametrize("missing_field", ["login", "password"])
-    def test_login_courier_missing_field_error(self, missing_field, courier_creation_fixture):
+    @allure.title('Test courier login without login field')
+    def test_login_courier_missing_login_error(self, courier_creation_fixture):
         payload = {
-            "login": courier_creation_fixture["payload"]["login"],
             "password": courier_creation_fixture["payload"]["password"]
         }
-        if missing_field == "password":
-            payload[missing_field] = ""
-        else:
-            del payload[missing_field]
 
         response = api.login_courier(payload)
-    
+
+        assert response.status_code == 400
+        assert "Недостаточно данных для входа" in response.text
+
+    @allure.story('Login Courier')
+    @allure.title('Test courier login without password field')
+    def test_login_courier_missing_password_error(self, courier_creation_fixture):
+        payload = {
+            "login": courier_creation_fixture["payload"]["login"],
+            "password": ""
+        }
+
+        response = api.login_courier(payload)
+
         assert response.status_code == 400
         assert "Недостаточно данных для входа" in response.text
 
@@ -86,3 +94,4 @@ class TestLoginAPI:
         response = api.login_courier(payload)
 
         assert response.status_code == 404
+        assert "Учетная запись не найдена" in response.text
