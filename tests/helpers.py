@@ -1,8 +1,8 @@
 import requests
 import random
 import string
+from .urls import BASE_URL
 
-BASE_URL = 'https://qa-scooter.praktikum-services.ru/api/v1'
 
 def generate_random_string(length):
     letters = string.ascii_lowercase

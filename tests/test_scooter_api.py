@@ -1,7 +1,8 @@
 import requests
 import pytest
 import allure
-from .helpers import generate_random_string, register_new_courier_and_return_login_password, BASE_URL
+from .helpers import generate_random_string, register_new_courier_and_return_login_password
+from .urls import BASE_URL
 
 @allure.feature('Courier API')
 class TestCourierAPI:
