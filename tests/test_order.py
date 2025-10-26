@@ -1,9 +1,9 @@
 import pytest
 import allure
-from . import api
+import api
 
 @allure.feature('Order API')
-class TestOrderAPI:
+class TestOrder:
 
     @allure.story('Create Order')
     @allure.title('Test successful order creation')
